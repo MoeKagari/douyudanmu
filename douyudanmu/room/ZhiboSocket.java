@@ -23,6 +23,7 @@ public class ZhiboSocket implements MySocket {
 	private int rid;
 	
 	private boolean connectIsSuccessful;
+	private boolean loginIsSuccessful;
 	
 	private Socket socket;
 	private ReceiveThread receiver;
@@ -36,26 +37,44 @@ public class ZhiboSocket implements MySocket {
 	}
 	private void connect(){
 		try {
+			print("开始连接直播服务器......");
 			socket = new Socket(zhiboStart.getZhiboAdress(),zhiboStart.getZhiboPort());
 			receiver = new ReceiveThread(socket.getInputStream(),info,zhiboStart);
 			sender = new SendThread(socket.getOutputStream(),info,zhiboStart);
-			connectIsSuccessful = true;
+			setConnectIsSuccessful(true);
+			print("连接直播服务器成功......");
 		} catch (IOException e) {
+			setConnectIsSuccessful(false);
 			print("连接直播服务器失败......");
-			connectIsSuccessful = false;
 		}
 	}
 	private void login(){
 		print("向直播服务器发送登陆请求......");
-		sender.sendLoginMessage(zhiboStart.getRoomId());
+		if(!sender.sendLoginMessage(zhiboStart.getRoomId())){
+			setLoginIsSuccessful(false);
+			return;
+		}
+		
 		String message = null;
 		message = receiver.receive();
+		if(message == null){
+			setLoginIsSuccessful(false);
+			return;
+		}
 		print("收到直播服务器返回的第一次包.");
+		
 		message = receiver.receive();
+		if(message == null){
+			setLoginIsSuccessful(false);
+			return;
+		}
 		print("收到直播服务器返回的第二次包.");
+		
 		initGid(message);
 		initRid(message);
 		initDanmuServer(message);
+		print("登陆直播服务器成功");
+		setLoginIsSuccessful(true);
 	}
 	private void initGid(String data){
 		setGid(Parse.parseGid(data));
@@ -86,7 +105,7 @@ public class ZhiboSocket implements MySocket {
 			sender.close();
 			socket.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println("ZhiboSocket。close()错误");
 		}
 	}
 	
@@ -113,5 +132,14 @@ public class ZhiboSocket implements MySocket {
 	}
 	public boolean getConnectIsSuccessful(){
 		return connectIsSuccessful;
+	}
+	private void setConnectIsSuccessful(boolean connectIsSuccessful){
+		this.connectIsSuccessful = connectIsSuccessful;
+	}
+	public boolean getLoginIsSuccessful(){
+		return loginIsSuccessful;
+	}
+	private void setLoginIsSuccessful(boolean loginIsSuccessful){
+		this.loginIsSuccessful = loginIsSuccessful;
 	}
 }

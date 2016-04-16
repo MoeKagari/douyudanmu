@@ -12,7 +12,6 @@ public class DanmuServer {
 		this.server = new ZhiboServer(adress, port);
 	}
 	
-	
 	public String getAdress() {
 		return server.getAdress();
 	}

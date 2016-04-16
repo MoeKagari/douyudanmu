@@ -14,7 +14,6 @@ public class ZhiboServer {
 		this.port = port;
 	}
 	
-	
 	public String getAdress() {
 		return adress;
 	}

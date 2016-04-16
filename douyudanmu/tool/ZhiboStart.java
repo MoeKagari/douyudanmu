@@ -32,17 +32,25 @@ public class ZhiboStart {
 	private void init(){
 		initDanmuRoom();
 		initZhiboRoom();
+		if(!zhiboRoom.getInitIsSuccessful()){
+			showError("获取房间源代码失败，或许是房间不存在，或许网络有问题：\n" + getRoomUrl());
+			return;
+		}
 		show();
 		initZhiboRoute();
 		initZhiboSocket();
 		if(!zhiboSocket.getConnectIsSuccessful()){
-			printMessage("程序将会关闭,请自行关闭界面......");
+			printMessage("程序自动关闭,请自行关闭界面......");
+			return;
+		}
+		if(!zhiboSocket.getLoginIsSuccessful()){
+			printMessage("程序自动关闭,请自行关闭界面......");
 			return;
 		}
 		initDanmuRoute();
 		initDanmuSocket();
-		if(!danmuSocket.getConnectIsSuccessful()){
-			printMessage("程序将会关闭,请自行关闭界面......");
+		if(!danmuSocket.getConnectIsSuccessful() || !danmuSocket.getLoginIsSuccessful()){
+			printMessage("程序自动关闭,请自行关闭界面......");
 			return;
 		}
 		run();
@@ -74,16 +82,23 @@ public class ZhiboStart {
 	private void show(){
 		danmuRoom.show();
 	}
+	private void showError(String message){
+		danmuRoom.showError(message);
+	}
 	
 	
 	
 	public void printMessage(String message){
 		danmuRoom.printMessage(message);
 	}
+	public void printDanmu(Message danmu){
+		danmuRoom.printDanmu(danmu);
+	}
 	
 	
 	public void run() {
-		zhiboSocket.run();
+		if(zhiboSocket != null)
+			zhiboSocket.finish();
 		danmuSocket.run();
 	}
 	public void finish(){
@@ -134,5 +149,4 @@ public class ZhiboStart {
 	public int getDanmuPort() {
 		return danmuRoute.getPort();
 	}
-	
 }

@@ -6,21 +6,27 @@ import java.util.regex.Pattern;
 public class Message {
 	private String type;
 	private String username;
-	private String danmu;
+	private String word;
 	
 	public Message(String data) {
 		this.type = parseType(data);
 		this.username = parseUsername(data);
-		this.danmu = parseDanmu(data);
+		this.word = parseWord(data);
 	}
 	
 	public String toString(){
 		if(getType().equals("chatmsg"))
-			return username + "£º" + danmu;
+			return username + "£º" + word;
 		return "·Çµ¯Ä»ÏûÏ¢.";
 	}
 	public String getType(){
 		return type;
+	}
+	public String getUsername(){
+		return username;
+	}
+	public String getWord(){
+		return word;
 	}
 	
 	
@@ -28,7 +34,7 @@ public class Message {
 	
 	private final static String regex_type = "type@=(.+?)/";
 	private final static String regex_username = "nn@=(.+?)/";
-	private final static String regex_danmu = "txt@=(.+?)/";
+	private final static String regex_word = "txt@=(.+?)/";
 	
 	private static Matcher getMatcher(String data,String regex){
 		Pattern pat = Pattern.compile(regex);
@@ -46,8 +52,8 @@ public class Message {
 	private static String parseUsername(String data){
 		return parse(data, regex_username);
 	}
-	private static String parseDanmu(String data){
-		return parse(data, regex_danmu);
+	private static String parseWord(String data){
+		return parse(data, regex_word);
 	}
 	
 }

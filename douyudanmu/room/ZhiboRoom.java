@@ -11,6 +11,8 @@ import douyudanmu.tool.ZhiboStart;
  *
  */
 public class ZhiboRoom {
+	private boolean initIsSuccessful;
+	
 	private int roomId;
 	private String roomTitle;
 	private ArrayList<ZhiboServer> zhiboServer;
@@ -24,13 +26,22 @@ public class ZhiboRoom {
 	}
 	private void init() {
 		String code = HtmlPage.getHtmlContent(zhiboStart.getRoomUrl());
+		if(code != null){
+			this.initIsSuccessful = true;
+		}
+		else{
+			this.initIsSuccessful = false;
+			return;
+		}
 		this.roomId = Parse.parseId(code);
 		this.roomTitle = Parse.parseName(code);
 		this.zhiboServer = Parse.parseZhiboServer(code);
 		this.online = Parse.parseOnline(code);
-		zhiboStart.printMessage("当前主播" + (getOnline()?"在线":"离线"));
+		print("当前主播" + (getOnline()?"在线":"离线"));
 	}
-	
+	private void print(String message){
+		zhiboStart.printMessage(message);
+	}
 	
 	
 	
@@ -45,5 +56,8 @@ public class ZhiboRoom {
 	}
 	public ArrayList<ZhiboServer> getZhiboServer() {
 		return zhiboServer;
+	}
+	public boolean getInitIsSuccessful(){
+		return initIsSuccessful;
 	}
 }

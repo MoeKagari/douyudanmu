@@ -8,12 +8,20 @@ import douyudanmu.tool.ZhiboStart;
  *
  */
 public class MainStart {
-	private ZhiboStart[] zhiboStart = null;
 	
-	public MainStart(String[] name,int zhiboxianlu,int danmuxianlu) {
+	public static void main(String[] args) {
+		
+		String[] name = {
+				//"457896",
+				"414818"
+		};//房间名字，上网页看到的地址栏最后
+		int zhiboxianlu = 0;//直播线路，0开始，不能过大，过大则0
+		int danmuxianlu = 0;//弹幕线路，0开始，不能过大，过大则0
+		
 		int len = name.length;
-		zhiboStart = new ZhiboStart[len];
+		ZhiboStart[] zhiboStart = new ZhiboStart[len];
 		for(int i = 0;i < len;i++)
 			zhiboStart[i] = new ZhiboStart(name[i], zhiboxianlu, danmuxianlu,len);
 	}
+	
 }

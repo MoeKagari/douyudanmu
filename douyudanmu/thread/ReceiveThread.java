@@ -29,26 +29,24 @@ public class ReceiveThread extends Thread implements MyThread {
 			String data = new String(b,"utf8");
 			Message message = new Message(data);
 			//如果是弹幕消息，就输出弹幕，否则原样输出
-			if(message.getType().equals("chatmsg")){
-				Log.printDanmu(message);
-				zhiboStart.printMessage(message.toString());
+			if("chatmsg".equals(message.getType())){
+				zhiboStart.printDanmu(message);
 				return message.toString();
 			}
 			else{
-				//print(data);
+				print(data);
 				return data;
 			}
 		} catch (IOException e) {
-			return "接受消息错误";
+			return null;
 		}
 	}
-	private void print(String data){
-		if(info == Mode.zhibo)
-			Log.messageFromZhiboServer(data);
-		else if(info == Mode.danmu)
-			Log.messageFromDanmuServer(data);
+	private void print(String message){
+		if(info == Mode.danmu)
+			;
+		else if(info == Mode.zhibo)
+			Log.messageFromZhiboServer(message);
 	}
-	
 	
 	
 	public void run(){

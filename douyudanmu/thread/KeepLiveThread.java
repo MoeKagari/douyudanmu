@@ -3,7 +3,6 @@ package douyudanmu.thread;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import douyudanmu.tool.Log;
 import douyudanmu.tool.Conmunication;
 import douyudanmu.tool.Parse;
 import douyudanmu.tool.ZhiboStart;
@@ -38,10 +37,10 @@ public class KeepLiveThread extends Thread implements MyThread {
 			//每40秒发送一次keeplive包
 			String message = Conmunication.getKeepLiveMessage();
 			byte[] b = Parse.getByteArray(message);
-			os.write(b);Log.keepLive(zhiboStart);
-			
+			os.write(b);
+			zhiboStart.printMessage("KeepLive......");
 		} catch (InterruptedException | IOException e) {
-			e.printStackTrace();
+			zhiboStart.printMessage("KeepLive发送失败......");
 		}
 	}
 	

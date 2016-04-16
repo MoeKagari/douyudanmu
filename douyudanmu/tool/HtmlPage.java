@@ -19,7 +19,6 @@ public class HtmlPage {
 			br.close();
 			return code.toString();
 		} catch (IOException e) {
-			System.out.println("获取房间源代码失败，或许是房间不存在，或许网络有问题：\n" + room_url);
 			return null;
 		}
 	}

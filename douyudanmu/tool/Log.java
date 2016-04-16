@@ -32,7 +32,7 @@ public class Log {
 		print(prefix,message);
 	}
 	
-	public static void keepLive(ZhiboStart zhiboStart){
+	public static void keepLive(){
 		String prefix = "keepLive................";
 		print(prefix,"");
 	}

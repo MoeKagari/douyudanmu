@@ -42,76 +42,78 @@ public class Parse {
 	/**
 	 * “右斜杠uxxxx”格式的字符串转换为unicode字符
 	 */
-	public static char unicodeToString(String unicode){
-		int ch = 0;
+	private static char unicodeToString(String unicode){
+		long res = 0;
 		for(int i = 2;i < unicode.length();i++){
 			boolean isOtherChar = false;
+			long ch = 0;
 			switch(unicode.charAt(i)){
-				case '1':ch +=  1 << (5 - i) * 4;break;
-				case '2':ch +=  2 << (5 - i) * 4;break;
-				case '3':ch +=  3 << (5 - i) * 4;break;
-				case '4':ch +=  4 << (5 - i) * 4;break;
-				case '5':ch +=  5 << (5 - i) * 4;break;
-				case '6':ch +=  6 << (5 - i) * 4;break;
-				case '7':ch +=  7 << (5 - i) * 4;break;
-				case '8':ch +=  8 << (5 - i) * 4;break;
-				case '9':ch +=  9 << (5 - i) * 4;break;
-				case '0':ch +=  0 << (5 - i) * 4;break;
+				case '1':ch =  1;break;
+				case '2':ch =  2;break;
+				case '3':ch =  3;break;
+				case '4':ch =  4;break;
+				case '5':ch =  5;break;
+				case '6':ch =  6;break;
+				case '7':ch =  7;break;
+				case '8':ch =  8;break;
+				case '9':ch =  9;break;
+				case '0':ch =  0;break;
 				case 'a':
-				case 'A':ch += 10 << (5 - i) * 4;break;
+				case 'A':ch = 10;break;
 				case 'b':
-				case 'B':ch += 11 << (5 - i) * 4;break;
+				case 'B':ch = 11;break;
 				case 'c':
-				case 'C':ch += 12 << (5 - i) * 4;break;
+				case 'C':ch = 12;break;
 				case 'd':
-				case 'D':ch += 13 << (5 - i) * 4;break;
+				case 'D':ch = 13;break;
 				case 'e':
-				case 'E':ch += 14 << (5 - i) * 4;break;
+				case 'E':ch = 14;break;
 				case 'f':
-				case 'F':ch += 15 << (5 - i) * 4;break;
+				case 'F':ch = 15;break;
 				default :isOtherChar = true;
 			}
 			if(isOtherChar){
 				System.out.println("unicode含有其他字符.");
 				return 0;
 			}
+			res += ch << (5 - i) * 4;
 		}
 		
-		return (char)ch;
+		return (char)res;
 	}
 	
 	public static boolean parseOnline(String code){
 		Matcher mat = getMatcher(code,regex_online);
-		int status = 0;
+		int res = 0;
 		if(mat.find()){
-			status = Integer.parseInt(mat.group(1));
+			res = Integer.parseInt(mat.group(1));
 		}
-		return status == 1;
+		return res == 1;
 			
 	}
 	public static int parseRid(String data){
-		int rid = -1;
+		int res = -1;
 		Matcher mat = getMatcher(data, regex_rid);
 		if(mat.find()){
-			rid = Integer.parseInt(mat.group(1));
+			res = Integer.parseInt(mat.group(1));
 		}
-		return rid;
+		return res;
 	}
 	public static int parseGid(String data){
-		int gid = -1;
+		int res = -1;
 		Matcher mat = getMatcher(data, regex_gid);
 		if(mat.find()){
-			gid = Integer.parseInt(mat.group(1));
+			res = Integer.parseInt(mat.group(1));
 		}
-		return gid;
+		return res;
 	}
 	public static int parseId(String code){
-		int id = -1;
+		int res = -1;
 		Matcher mat = getMatcher(code, regex_room_id);
 		if(mat.find()){
-			id = Integer.parseInt(mat.group(1));
+			res = Integer.parseInt(mat.group(1));
 		}
-		return id;
+		return res;
 	}
 	public static String parseName(String code){
 		String name = null;
@@ -142,19 +144,19 @@ public class Parse {
 		return res;
 	}
 	public static ArrayList<DanmuServer> parseDanmuServer(String code){
-		ArrayList<DanmuServer> danmuServer = new ArrayList<DanmuServer>();
+		ArrayList<DanmuServer> res = new ArrayList<DanmuServer>();
 		Matcher mat = getMatcher(code,regex_danmuServer);
 		while(mat.find()){
 			String adress = mat.group(1);
 			int port = Integer.parseInt(mat.group(2));
-			danmuServer.add(new DanmuServer(adress,port));
+			res.add(new DanmuServer(adress,port));
 		}
-		return danmuServer;
+		return res;
 	}
 	public static byte[] getByteArray(String data){
-		byte[] b = new byte[data.length()];
+		byte[] res = new byte[data.length()];
 		for(int i = 0;i < data.length();i++)
-			b[i] = (byte)data.charAt(i);
-		return b;
+			res[i] = (byte)data.charAt(i);
+		return res;
 	}
 }

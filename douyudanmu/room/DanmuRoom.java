@@ -1,13 +1,19 @@
 package douyudanmu.room;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import douyudanmu.MainStart;
+import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+
+import douyudanmu.tool.Message;
 import douyudanmu.tool.ZhiboStart;
 
 /**
@@ -21,8 +27,10 @@ public class DanmuRoom{
 	private ZhiboStart zhiboStart;
 	
 	private JFrame frame;
-	JTextArea textarea;
+	JTextPane text;
 	JScrollPane jsc;
+	Document doc;
+	SimpleAttributeSet set;
 	
 	public DanmuRoom(ZhiboStart zhiboStart){
 		this.zhiboStart = zhiboStart;
@@ -41,13 +49,16 @@ public class DanmuRoom{
 			}
 		});
 		
-		textarea = new JTextArea("");
-		textarea.setEditable(false);
-		textarea.setFont(new Font("TimesRoman",Font.PLAIN,18));
-		textarea.setLineWrap(true);
+		text = new JTextPane();
+		text.setEditable(false);
+		text.setFont(new Font("TimesRoman",Font.PLAIN,18));
+		//text.setLineWrap(true);
 		
-		jsc = new JScrollPane(textarea);
+		jsc = new JScrollPane(text);
 		frame.getContentPane().add(jsc);
+		
+		doc = text.getDocument();
+		set = new SimpleAttributeSet();
 	}
 	
 	public void show(){
@@ -57,34 +68,34 @@ public class DanmuRoom{
 				);
 		frame.setVisible(true);
 	}
-	
-	public void printMessage(String message){
-		textarea.append(message + "\n");
-		textarea.setCaretPosition(textarea.getText().length());
+	public void showError(String message){
+		frame.setVisible(true);
+		printMessage(message);
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	public static void main(String[] args) {
-		String[] name = {
-				"457896"
-		};//房间名字，上网页看到的地址栏最后
-		int zhiboxianlu = 0;//直播线路，0开始，不能过大，过大则0
-		int danmuxianlu = 0;//弹幕线路，0开始，不能过大，过大则0
-		new MainStart(name,zhiboxianlu,danmuxianlu);
-		
+	public void printMessage(String message){
+		try {
+			StyleConstants.setForeground(set,Color.black);
+			StyleConstants.setBold(set, false);
+			doc.insertString(doc.getLength(), message + "\n", set);
+			text.setCaretPosition(text.getDocument().getLength());
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+	}
+	public void printDanmu(Message danmu){
+		try {
+			StyleConstants.setForeground(set,Color.red);
+			StyleConstants.setBold(set, true);
+			doc.insertString(doc.getLength(), danmu.getUsername(), set);
+			
+			StyleConstants.setForeground(set,Color.black);
+			StyleConstants.setBold(set, false);
+			doc.insertString(doc.getLength(),"：" + danmu.getWord() + "\n", set);
+			text.setCaretPosition(text.getDocument().getLength());
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
 	}
 	
 }
