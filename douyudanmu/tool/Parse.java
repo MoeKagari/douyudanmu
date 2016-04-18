@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import douyudanmu.room.DanmuServer;
-import douyudanmu.room.ZhiboServer;
+import douyudanmu.room.MyServer;
 
 public class Parse {
 	private final static String regex_room_id = "\"room_id\":(.+?),";
@@ -115,22 +114,22 @@ public class Parse {
 		}
 		return res;
 	}
-	public static String parseName(String code){
-		String name = null;
+	public static String parseRoomTitle(String code){
+		String res = null;
 		Matcher mat = getMatcher(code,regex_room_name[0]);
 		if(mat.find()){
-			name = mat.group(1);
+			res = mat.group(1);
 		}
-		mat = getMatcher(name,regex_room_name[1]);
+		mat = getMatcher(res,regex_room_name[1]);
 		while(mat.find()){
 			String unicode = mat.group();
 			char ch = unicodeToString(unicode);
-			name = name.replace(unicode,new Character(ch).toString());
+			res = res.replace(unicode,new Character(ch).toString());
 		}
-		return name;
+		return res;
 	}
-	public static ArrayList<ZhiboServer> parseZhiboServer(String code){
-		ArrayList<ZhiboServer> res = new ArrayList<ZhiboServer>();
+	public static ArrayList<MyServer> parseZhiboServer(String code){
+		ArrayList<MyServer> res = new ArrayList<MyServer>();
 		Matcher mat = getMatcher(code, regex_zhiboServer[0]);
 		if(mat.find()){
 			String temp = mat.group(1);
@@ -138,18 +137,18 @@ public class Parse {
 			while(mat.find()){
 				String adress = mat.group(1);
 				int port = Integer.parseInt(mat.group(2));
-				res.add(new ZhiboServer(adress, port));
+				res.add(new MyServer(adress, port));
 			}
 		}
 		return res;
 	}
-	public static ArrayList<DanmuServer> parseDanmuServer(String code){
-		ArrayList<DanmuServer> res = new ArrayList<DanmuServer>();
+	public static ArrayList<MyServer> parseDanmuServer(String code){
+		ArrayList<MyServer> res = new ArrayList<MyServer>();
 		Matcher mat = getMatcher(code,regex_danmuServer);
 		while(mat.find()){
 			String adress = mat.group(1);
 			int port = Integer.parseInt(mat.group(2));
-			res.add(new DanmuServer(adress,port));
+			res.add(new MyServer(adress,port));
 		}
 		return res;
 	}

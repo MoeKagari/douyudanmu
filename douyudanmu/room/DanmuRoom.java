@@ -22,15 +22,15 @@ import douyudanmu.tool.ZhiboStart;
  *
  */
 public class DanmuRoom{
-	static int count = 0; //用来记录多少个界面已经关闭
+	private static int count = 0; //用来记录多少个界面已经关闭
 	
 	private ZhiboStart zhiboStart;
 	
 	private JFrame frame;
-	JTextPane text;
-	JScrollPane jsc;
-	Document doc;
-	SimpleAttributeSet set;
+	private JTextPane text;
+	private JScrollPane jsc;
+	private Document doc;
+	private SimpleAttributeSet set;
 	
 	public DanmuRoom(ZhiboStart zhiboStart){
 		this.zhiboStart = zhiboStart;
@@ -52,7 +52,6 @@ public class DanmuRoom{
 		text = new JTextPane();
 		text.setEditable(false);
 		text.setFont(new Font("TimesRoman",Font.PLAIN,18));
-		//text.setLineWrap(true);
 		
 		jsc = new JScrollPane(text);
 		frame.getContentPane().add(jsc);
@@ -68,16 +67,25 @@ public class DanmuRoom{
 				);
 		frame.setVisible(true);
 	}
-	public void showError(String message){
-		frame.setVisible(true);
-		printMessage(message);
+	public void printError(String message){
+		try {
+			frame.setVisible(true);
+			
+			StyleConstants.setForeground(set,Color.red);
+			StyleConstants.setBold(set, false);
+			doc.insertString(doc.getLength(), message + "\n", set);
+			
+			text.setCaretPosition(text.getDocument().getLength());
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
 	}
-	
 	public void printMessage(String message){
 		try {
 			StyleConstants.setForeground(set,Color.black);
 			StyleConstants.setBold(set, false);
 			doc.insertString(doc.getLength(), message + "\n", set);
+			
 			text.setCaretPosition(text.getDocument().getLength());
 		} catch (BadLocationException e) {
 			e.printStackTrace();
@@ -85,17 +93,24 @@ public class DanmuRoom{
 	}
 	public void printDanmu(Message danmu){
 		try {
-			StyleConstants.setForeground(set,Color.red);
+			StyleConstants.setForeground(set,Color.blue);
 			StyleConstants.setBold(set, true);
 			doc.insertString(doc.getLength(), danmu.getUsername(), set);
 			
 			StyleConstants.setForeground(set,Color.black);
 			StyleConstants.setBold(set, false);
 			doc.insertString(doc.getLength(),"：" + danmu.getWord() + "\n", set);
+			
 			text.setCaretPosition(text.getDocument().getLength());
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
+	}
+	public void reTitle(String title,boolean online){
+		frame.setTitle(
+				(zhiboStart.getOnline()?"[在线]":"[离线]") +
+				zhiboStart.getRoomTitle()
+				);
 	}
 	
 }

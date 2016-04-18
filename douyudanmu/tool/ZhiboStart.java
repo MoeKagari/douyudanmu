@@ -1,11 +1,11 @@
 package douyudanmu.tool;
 
 import douyudanmu.room.DanmuRoom;
-import douyudanmu.room.DanmuServer;
 import douyudanmu.room.DanmuSocket;
+import douyudanmu.room.MyServer;
 import douyudanmu.room.ZhiboRoom;
-import douyudanmu.room.ZhiboServer;
 import douyudanmu.room.ZhiboSocket;
+import douyudanmu.thread.ReTitleThread;
 
 public class ZhiboStart {
 	private final String path = "http://www.douyu.com/";
@@ -17,10 +17,11 @@ public class ZhiboStart {
 	
 	private DanmuRoom danmuRoom;
 	private ZhiboRoom zhiboRoom;
-	private ZhiboServer zhiboRoute;
+	private MyServer zhiboRoute;
 	private ZhiboSocket zhiboSocket;
-	private DanmuServer danmuRoute;
+	private MyServer danmuRoute;
 	private DanmuSocket danmuSocket;
+	private ReTitleThread reTitler;
 	
 	public ZhiboStart(String name,int zhiboxianlu,int danmuxianlu,int number) {
 		this.name = name;
@@ -32,28 +33,29 @@ public class ZhiboStart {
 	private void init(){
 		initDanmuRoom();
 		initZhiboRoom();
-		if(!zhiboRoom.getInitIsSuccessful()){
-			showError("获取房间源代码失败，或许是房间不存在，或许网络有问题：\n" + getRoomUrl());
+		if(!zhiboRoom.getInitIsSuccessful())
 			return;
-		}
+		
 		show();
 		initZhiboRoute();
+		if(zhiboRoute == null)
+			return;
+		
 		initZhiboSocket();
-		if(!zhiboSocket.getConnectIsSuccessful()){
-			printMessage("程序自动关闭,请自行关闭界面......");
+		if(!zhiboSocket.getConnectIsSuccessful() || !zhiboSocket.getLoginIsSuccessful())
 			return;
-		}
-		if(!zhiboSocket.getLoginIsSuccessful()){
-			printMessage("程序自动关闭,请自行关闭界面......");
-			return;
-		}
+		
 		initDanmuRoute();
-		initDanmuSocket();
-		if(!danmuSocket.getConnectIsSuccessful() || !danmuSocket.getLoginIsSuccessful()){
-			printMessage("程序自动关闭,请自行关闭界面......");
+		if(danmuRoute == null)
 			return;
-		}
-		run();
+		
+		initDanmuSocket();
+		if(!danmuSocket.getConnectIsSuccessful() || !danmuSocket.getLoginIsSuccessful())
+			return;
+		
+		initReTitler();
+		
+		start();
 	}
 	private void initDanmuRoom(){
 		danmuRoom = new DanmuRoom(this);
@@ -62,7 +64,7 @@ public class ZhiboStart {
 		zhiboRoom = new ZhiboRoom(this);
 	}
 	private void initZhiboRoute(){
-		if(zhiboxianlu > zhiboRoom.getZhiboServer().size())
+		if(zhiboxianlu + 1 > zhiboRoom.getZhiboServer().size())
 			zhiboRoute = zhiboRoom.getZhiboServer().get(0);
 		else
 			zhiboRoute = zhiboRoom.getZhiboServer().get(zhiboxianlu);
@@ -71,7 +73,7 @@ public class ZhiboStart {
 		zhiboSocket = new ZhiboSocket(this);
 	}
 	private void initDanmuRoute(){
-		if(danmuxianlu > zhiboSocket.getDanmuServer().size())
+		if(danmuxianlu + 1 > zhiboSocket.getDanmuServer().size())
 			danmuRoute = zhiboSocket.getDanmuServer().get(0);
 		else
 			danmuRoute = zhiboSocket.getDanmuServer().get(danmuxianlu);
@@ -79,41 +81,77 @@ public class ZhiboStart {
 	private void initDanmuSocket(){
 		danmuSocket = new DanmuSocket(this);
 	}
+	private void initReTitler(){
+		reTitler = new ReTitleThread(this);
+	}
 	private void show(){
 		danmuRoom.show();
 	}
-	private void showError(String message){
-		danmuRoom.showError(message);
+	private void waitReTitlerFinish(){
+		while(reTitler.isOver()){
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	
 	
+	
+	public void printError(String error){
+		danmuRoom.printError(error);
+	}
 	public void printMessage(String message){
 		danmuRoom.printMessage(message);
 	}
 	public void printDanmu(Message danmu){
 		danmuRoom.printDanmu(danmu);
 	}
+	public void reTitle(String title,boolean online){
+		danmuRoom.reTitle(title,online);
+	}
 	
 	
-	public void run() {
+	
+	public void start() {
 		if(zhiboSocket != null)
-			zhiboSocket.finish();
-		danmuSocket.run();
+			zhiboSocket.start();
+		if(danmuSocket != null)
+			danmuSocket.start();
+		if(reTitler != null)
+			reTitler.start();
 	}
 	public void finish(){
 		if(zhiboSocket != null)
 			zhiboSocket.finish();
 		if(danmuSocket != null)
 			danmuSocket.finish();
-		this.close();
+		if(reTitler != null)
+			reTitler.finish();
+		waitReTitlerFinish();
+		close();
 	}
 	public void close(){
 		if(zhiboSocket != null)
 			zhiboSocket.close();
 		if(danmuSocket != null)
 			danmuSocket.close();
+		if(reTitler != null)
+			reTitler.close();
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	public int getNumber(){
@@ -122,8 +160,14 @@ public class ZhiboStart {
 	public boolean getOnline(){
 		return zhiboRoom.getOnline();
 	}
+	public void setOnline(boolean online){
+		zhiboRoom.setOnline(online);
+	}
 	public String getRoomTitle(){
 		return zhiboRoom.getRoomTitle();
+	}
+	public void setRoomTitle(String roomTitle){
+		zhiboRoom.setRoomTitle(roomTitle);
 	}
 	public String getRoomUrl(){
 		return path + name;
@@ -149,4 +193,5 @@ public class ZhiboStart {
 	public int getDanmuPort() {
 		return danmuRoute.getPort();
 	}
+	
 }

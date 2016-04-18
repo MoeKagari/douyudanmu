@@ -1,15 +1,10 @@
 package douyudanmu.room;
 
-/**
- * ”√¿¥¥Ê¥¢ZhiboServer
- * @author MoeKagari
- *
- */
-public class ZhiboServer {
+public class MyServer {
 	private String adress;
 	private int port;
 	
-	public ZhiboServer(String adress,int port) {
+	public MyServer(String adress,int port) {
 		this.adress = adress;
 		this.port = port;
 	}

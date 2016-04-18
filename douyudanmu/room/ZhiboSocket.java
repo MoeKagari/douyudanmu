@@ -18,7 +18,7 @@ public class ZhiboSocket implements MySocket {
 	private final Mode info = Mode.zhibo;
 	private ZhiboStart zhiboStart;
 	
-	private ArrayList<DanmuServer> danmuServer;
+	private ArrayList<MyServer> danmuServer;
 	private int gid;
 	private int rid;
 	
@@ -31,115 +31,111 @@ public class ZhiboSocket implements MySocket {
 	
 	public ZhiboSocket(ZhiboStart zhiboStart){
 		this.zhiboStart = zhiboStart;
-		connect();//连接直播服务器是否成功，成功就登陆
-		if(connectIsSuccessful)
-			login();//登陆直播服务器，之后初始化danmuServer,gid,rid
+		init();
 	}
-	private void connect(){
+	private void init(){
+		printMessage("开始连接直播服务器......");
+		connectIsSuccessful = connect();//连接直播服务器是否成功，成功就登陆
+		if(!connectIsSuccessful){
+			printError("连接直播服务器失败");
+			printMessage("程序自动关闭,请自行关闭界面......");
+		}
+		printMessage("连接直播服务器成功");
+		
+		printMessage("向直播服务器发送登陆请求......");
+		loginIsSuccessful = login();//登陆直播服务器，之后初始化danmuServer,gid,rid
+		if(!loginIsSuccessful){
+			printError("登陆直播服务器失败");
+			printMessage("程序自动关闭,请自行关闭界面......");
+		}
+		printMessage("登陆直播服务器成功");
+	}
+	private boolean connect(){
 		try {
-			print("开始连接直播服务器......");
 			socket = new Socket(zhiboStart.getZhiboAdress(),zhiboStart.getZhiboPort());
 			receiver = new ReceiveThread(socket.getInputStream(),info,zhiboStart);
 			sender = new SendThread(socket.getOutputStream(),info,zhiboStart);
-			setConnectIsSuccessful(true);
-			print("连接直播服务器成功......");
+			return true;
 		} catch (IOException e) {
-			setConnectIsSuccessful(false);
-			print("连接直播服务器失败......");
+			return false;
 		}
 	}
-	private void login(){
-		print("向直播服务器发送登陆请求......");
-		if(!sender.sendLoginMessage(zhiboStart.getRoomId())){
-			setLoginIsSuccessful(false);
-			return;
-		}
+	private boolean login(){
+		if(!sender.sendLoginMessage(zhiboStart.getRoomId()))
+			return false;
 		
-		String message = null;
+		String message;
 		message = receiver.receive();
-		if(message == null){
-			setLoginIsSuccessful(false);
-			return;
-		}
-		print("收到直播服务器返回的第一次包.");
+		if(message == null)
+			return false;
 		
 		message = receiver.receive();
-		if(message == null){
-			setLoginIsSuccessful(false);
-			return;
-		}
-		print("收到直播服务器返回的第二次包.");
+		if(message == null)
+			return false;
 		
 		initGid(message);
 		initRid(message);
 		initDanmuServer(message);
-		print("登陆直播服务器成功");
-		setLoginIsSuccessful(true);
+		return true;
 	}
 	private void initGid(String data){
-		setGid(Parse.parseGid(data));
+		gid = Parse.parseGid(data);
 	}
 	private void initRid(String data){
-		setRid(Parse.parseRid(data));
+		rid = Parse.parseRid(data);
 	}
 	private void initDanmuServer(String data){
-		setDanmuServer(Parse.parseDanmuServer(data));
+		danmuServer = Parse.parseDanmuServer(data);
 	}
-	private void print(String message){
+	private void printMessage(String message){
 		zhiboStart.printMessage(message);
 	}
-	
+	private void printError(String error){
+		zhiboStart.printError(error);
+	}
 
 	
-	public void run(){
-		receiver.start();
-		sender.start();
+	public void start(){
+		if(receiver != null)
+			receiver.start();
+		if(sender != null)
+			sender.start();
 	}
 	public void finish(){
-		receiver.finish();
-		sender.finish();
+		if(receiver != null)
+			receiver.finish();
+		if(sender != null)
+			sender.finish();
 	}
 	public void close(){
 		try {
-			receiver.close();
-			sender.close();
-			socket.close();
+			if(sender != null)
+				sender.close();
+			if(receiver != null)
+				receiver.close();
+			if(socket != null)
+				socket.close();
 		} catch (IOException e) {
-			System.err.println("ZhiboSocket。close()错误");
+			System.err.println("ZhiboSocket.close()错误");
 		}
 	}
 	
 	
 	
 	
-	public ArrayList<DanmuServer> getDanmuServer(){
+	public ArrayList<MyServer> getDanmuServer(){
 		return danmuServer;
-	}
-	private void setDanmuServer(ArrayList<DanmuServer> danmuServer){
-		this.danmuServer = danmuServer;
 	}
 	public int getGid(){
 		return gid;
 	}
-	private void setGid(int gid){
-		this.gid = gid;
-	}
 	public int getRid(){
 		return rid;
-	}
-	private void setRid(int rid){
-		this.rid = rid;
 	}
 	public boolean getConnectIsSuccessful(){
 		return connectIsSuccessful;
 	}
-	private void setConnectIsSuccessful(boolean connectIsSuccessful){
-		this.connectIsSuccessful = connectIsSuccessful;
-	}
 	public boolean getLoginIsSuccessful(){
 		return loginIsSuccessful;
-	}
-	private void setLoginIsSuccessful(boolean loginIsSuccessful){
-		this.loginIsSuccessful = loginIsSuccessful;
 	}
 }

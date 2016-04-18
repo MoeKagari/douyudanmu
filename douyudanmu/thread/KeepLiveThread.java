@@ -24,16 +24,16 @@ public class KeepLiveThread extends Thread implements MyThread {
 		try {
 			long total = 40000;
 			long per = 5000;
-			double count = total/per;
+			long count = total/per;
 			while(count > 0){
 				Thread.sleep(5000);//每5秒检查一次over
 				count--;
 				if(over){//如果over结束，就sendOver=true结束返回
-					setSendOver(true);
+					sendOver = true;
 					return;
 				}
 			}
-			Thread.sleep((long)(count * per));
+			Thread.sleep(total % per);
 			//每40秒发送一次keeplive包
 			String message = Conmunication.getKeepLiveMessage();
 			byte[] b = Parse.getByteArray(message);
@@ -52,7 +52,7 @@ public class KeepLiveThread extends Thread implements MyThread {
 		}
 	}
 	public void finish(){
-		setOver(true);
+		over = true;
 	}
 	public void close(){
 		try {
@@ -64,12 +64,6 @@ public class KeepLiveThread extends Thread implements MyThread {
 	
 	
 	
-	private void setOver(boolean over){
-		this.over = over;
-	}
-	private void setSendOver(boolean sendOver){
-		this.sendOver = sendOver;
-	}
 	public boolean isOver(){
 		return over && sendOver;
 	}
