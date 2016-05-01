@@ -1,5 +1,10 @@
 package douyudanmu.tool;
 
+/**
+ * log类，java原生的logger类更好
+ * @author MoeKagari
+ *
+ */
 public class Log {
 	
 	public static void print(String message){

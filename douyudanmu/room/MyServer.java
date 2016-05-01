@@ -1,16 +1,16 @@
 package douyudanmu.room;
 
 public class MyServer {
-	private String adress;
+	private String host;
 	private int port;
 	
-	public MyServer(String adress,int port) {
-		this.adress = adress;
+	public MyServer(String host,int port) {
+		this.host = host;
 		this.port = port;
 	}
 	
-	public String getAdress() {
-		return adress;
+	public String getHost() {
+		return host;
 	}
 	public int getPort() {
 		return port;

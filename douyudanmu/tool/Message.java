@@ -3,6 +3,11 @@ package douyudanmu.tool;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 弹幕类
+ * @author MoeKagari
+ *
+ */
 public class Message {
 	private String type;
 	private String username;
@@ -15,9 +20,9 @@ public class Message {
 	}
 	
 	public String toString(){
-		if(getType().equals("chatmsg"))
+		if("chatmsg".equals(getType()))
 			return username + "：" + word;
-		return "非弹幕消息.";
+		return "此消息类型还未做处理：" + String.valueOf(type);
 	}
 	public String getType(){
 		return type;

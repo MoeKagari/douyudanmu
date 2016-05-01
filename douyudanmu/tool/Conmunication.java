@@ -3,7 +3,11 @@ package douyudanmu.tool;
 import java.util.Random;
 import java.util.UUID;
 
-
+/**
+ * 连接和登陆 直播服务器以及弹幕服务器所需要的message
+ * @author MoeKagari
+ *
+ */
 public class Conmunication {
 	static int len = 0;
 	static int[] length = new int[]{len, 0x00, 0x00, 0x00};
@@ -11,9 +15,6 @@ public class Conmunication {
 	static int[] magic = new int[]{0xb1, 0x02, 0x00, 0x00};
 	//message is here
 	static int[] end = new int[]{0x00};
-	
-	
-	
 	private static void setLen(String message){
 		len = 4 + 4 + (message == null ? 0 : message.length()) + 1;
 		length[0] = len;

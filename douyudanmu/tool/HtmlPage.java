@@ -5,12 +5,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 
+/**
+ * 获取网页源代码
+ * @author MoeKagari
+ *
+ */
 public class HtmlPage {
 	
-	public static String getHtmlContent(String room_url) {
+	public static String getHtmlContent(String link) {
 		try {
 			StringBuffer code = new StringBuffer("");
-			URL url = new URL(room_url);
+			URL url = new URL(link);
 			BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream(),"utf-8"));
 			String buff = null;
 			while((buff = br.readLine()) != null){
